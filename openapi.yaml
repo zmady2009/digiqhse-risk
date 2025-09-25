@@ -1,0 +1,621 @@
+openapi: 3.1.0
+info:
+  title: DigiRisk Headless API
+  version: 0.1.0
+  license:
+    name: Proprietary
+    url: https://example.com/license
+servers:
+  - url: https://api.digirisk.company/digirisk
+    description: Production server (replace with actual base URL)
+  - url: https://staging.digirisk.company/digirisk
+    description: Staging server
+  - url: http://127.0.0.1:3000/digirisk
+    description: Local development server
+security:
+  - ApiKeyAuth: []
+paths:
+  /risks:
+    get:
+      summary: List risks
+      operationId: listRisks
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/QueryParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/FilterParam'
+      responses:
+        '200':
+          description: Paginated list of risks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskPage'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /risks/{riskId}:
+    get:
+      summary: Get risk detail
+      operationId: getRisk
+      parameters:
+        - $ref: '#/components/parameters/RiskIdPath'
+      responses:
+        '200':
+          description: Risk detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        '404':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /assessments:
+    post:
+      summary: Create assessment
+      operationId: createAssessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentCreateInput'
+      responses:
+        '201':
+          description: Assessment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+        '400':
+          $ref: '#/components/responses/ProblemResponse'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /assessments/{assessmentId}:
+    get:
+      summary: Get assessment detail
+      operationId: getAssessment
+      parameters:
+        - $ref: '#/components/parameters/AssessmentIdPath'
+      responses:
+        '200':
+          description: Assessment detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        '404':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+    patch:
+      summary: Update assessment
+      operationId: updateAssessment
+      parameters:
+        - $ref: '#/components/parameters/AssessmentIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentUpdateInput'
+      responses:
+        '200':
+          description: Assessment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+        '409':
+          description: Conflict detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+        '400':
+          $ref: '#/components/responses/ProblemResponse'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        '404':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /action-plans:
+    get:
+      summary: List action plans
+      operationId: listActionPlans
+      parameters:
+        - $ref: '#/components/parameters/RiskIdQuery'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Paginated list of action plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionPlanPage'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+    post:
+      summary: Create action plan
+      operationId: createActionPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionPlanCreateInput'
+      responses:
+        '201':
+          description: Action plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionPlan'
+        '400':
+          $ref: '#/components/responses/ProblemResponse'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /documents:
+    get:
+      summary: List documents
+      operationId: listDocuments
+      parameters:
+        - $ref: '#/components/parameters/RiskIdQuery'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Paginated list of documents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentPage'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+    post:
+      summary: Create document metadata
+      operationId: createDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCreateInput'
+      responses:
+        '201':
+          description: Document metadata created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          $ref: '#/components/responses/ProblemResponse'
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+  /reports/{riskId}/pdf:
+    get:
+      summary: Download risk report PDF
+      operationId: getRiskReportPdf
+      parameters:
+        - $ref: '#/components/parameters/RiskIdPath'
+      responses:
+        '200':
+          description: PDF stream
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/ProblemResponse'
+        '404':
+          $ref: '#/components/responses/ProblemResponse'
+        default:
+          $ref: '#/components/responses/ProblemResponse'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: DOLAPIKEY
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Page number starting at 1
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    SizeParam:
+      name: size
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    QueryParam:
+      name: query
+      in: query
+      description: Free text search query
+      schema:
+        type: string
+    FilterParam:
+      name: filters
+      in: query
+      description: JSON encoded filter object
+      schema:
+        type: string
+        example: '{"status":"open"}'
+    SortParam:
+      name: sort
+      in: query
+      description: Sort clause formatted as field,asc|desc
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9_.-]+,(asc|desc)$'
+        example: 'updatedAt,desc'
+    RiskIdPath:
+      name: riskId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    AssessmentIdPath:
+      name: assessmentId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    RiskIdQuery:
+      name: riskId
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  schemas:
+    PaginationMeta:
+      type: object
+      required:
+        - page
+        - size
+        - totalItems
+        - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        size:
+          type: integer
+          minimum: 1
+        totalItems:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+    Risk:
+      type: object
+      required:
+        - id
+        - code
+        - label
+        - unitId
+        - score
+        - status
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        label:
+          type: string
+        unitId:
+          type: integer
+        score:
+          type: number
+          format: float
+        status:
+          type: string
+          enum:
+            - open
+            - in_progress
+            - closed
+        updatedAt:
+          type: string
+          format: date-time
+    Assessment:
+      type: object
+      required:
+        - id
+        - riskId
+        - method
+        - score
+        - notes
+        - attachments
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        riskId:
+          type: integer
+        method:
+          type: string
+        score:
+          type: number
+          format: float
+        notes:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+        updatedAt:
+          type: string
+          format: date-time
+    AssessmentCreateInput:
+      type: object
+      required:
+        - riskId
+        - method
+        - score
+      properties:
+        riskId:
+          type: integer
+          minimum: 1
+        method:
+          type: string
+        score:
+          type: number
+          format: float
+        notes:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentCreateInput'
+    AssessmentUpdateInput:
+      type: object
+      properties:
+        method:
+          type: string
+        score:
+          type: number
+          format: float
+        notes:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentCreateInput'
+        updatedAt:
+          description: Last known update timestamp for optimistic locking
+          type: string
+          format: date-time
+    Attachment:
+      type: object
+      required:
+        - id
+        - name
+        - url
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+    AttachmentCreateInput:
+      type: object
+      required:
+        - name
+        - url
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+    ActionPlan:
+      type: object
+      required:
+        - id
+        - riskId
+        - title
+        - status
+      properties:
+        id:
+          type: integer
+        riskId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        owner:
+          type: string
+        status:
+          type: string
+          enum:
+            - planned
+            - in_progress
+            - done
+    ActionPlanCreateInput:
+      type: object
+      required:
+        - riskId
+        - title
+      properties:
+        riskId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        owner:
+          type: string
+        status:
+          type: string
+          enum:
+            - planned
+            - in_progress
+            - done
+    Document:
+      type: object
+      required:
+        - id
+        - riskId
+        - name
+        - url
+        - type
+        - createdAt
+      properties:
+        id:
+          type: integer
+        riskId:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        type:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    DocumentCreateInput:
+      type: object
+      required:
+        - riskId
+        - name
+        - type
+      properties:
+        riskId:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+    RiskPage:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Risk'
+    AssessmentPage:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Assessment'
+    ActionPlanPage:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActionPlan'
+    DocumentPage:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Document'
+    PaginatedResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: array
+          items: {}
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+    ConflictError:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          required:
+            - conflictWith
+          properties:
+            conflictWith:
+              type: string
+              description: Resource identifier that caused the conflict
+    ProblemDetails:
+      type: object
+      description: RFC7807 problem details
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        traceId:
+          type: string
+  responses:
+    ProblemResponse:
+      description: Error response
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
